@@ -182,11 +182,14 @@
 #pragma mark - Helpers
 
 - (NSString *)parseDeviceID:(NSData *)deviceToken {
-  NSString *token = [deviceToken description];
-  return [[self regex] stringByReplacingMatchesInString:token
-                                                options:0
-                                                  range:NSMakeRange(0, [token length])
-                                           withTemplate:@""];
+  const char *data = [deviceToken bytes];
+  NSMutableString *token = [NSMutableString string];
+
+  for (NSUInteger i = 0; i < [deviceToken length]; i++) {
+      [token appendFormat:@"%02.2hhX", data[i]];
+  }
+
+  return [token copy];
 }
 
 - (NSRegularExpression *)regex {
