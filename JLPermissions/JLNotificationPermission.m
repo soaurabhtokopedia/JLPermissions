@@ -83,18 +83,7 @@
     [self actuallyAuthorize];
   } else if (!previouslyAsked) {
     _completion = completion;
-    if (self.isExtraAlertEnabled) {
-      UIAlertView *alert = [[UIAlertView alloc] initWithTitle:messageTitle
-                                                      message:message
-                                                     delegate:self
-                                            cancelButtonTitle:cancelTitle
-                                            otherButtonTitles:grantTitle, nil];
-      dispatch_async(dispatch_get_main_queue(), ^{
-        [alert show];
-      });
-    } else {
-      [self actuallyAuthorize];
-    }
+    [self actuallyAuthorize];
   } else {
     if (completion) {
       completion(false, [self previouslyDeniedError]);
