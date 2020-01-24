@@ -138,28 +138,25 @@
 }
 
 - (void)actuallyAuthorize {
-  [[NSUserDefaults standardUserDefaults] setBool:true forKey:kJLAskedForNotificationPermission];
-  [[NSUserDefaults standardUserDefaults] synchronize];
-
-  if ([[UIApplication sharedApplication]
-          respondsToSelector:@selector(registerUserNotificationSettings:)]) {
-    UIUserNotificationSettings *userNotificationSettings = self.userNotificationSettings;
-    if (!userNotificationSettings) {
-      userNotificationSettings = [UIUserNotificationSettings
-          settingsForTypes:(UIUserNotificationTypeAlert | UIUserNotificationTypeBadge |
-                            UIUserNotificationTypeSound)
-                categories:nil];
+    [[NSUserDefaults standardUserDefaults] setBool:true forKey:kJLAskedForNotificationPermission];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    UNAuthorizationOptions authorizationOptions = self.authorizationOptions;
+    
+    if (authorizationOptions == UNAuthorizationOptionNone) {
+        authorizationOptions = (UNAuthorizationOptionAlert | UNAuthorizationOptionSound | UNAuthorizationOptionBadge);
+        if (@available(iOS 12.0, *)) {
+            authorizationOptions = (authorizationOptions | UNAuthorizationOptionProvidesAppNotificationSettings);
+        }
     }
-    [[UIApplication sharedApplication] registerUserNotificationSettings:userNotificationSettings];
+    [[UNUserNotificationCenter currentNotificationCenter] requestAuthorizationWithOptions:authorizationOptions completionHandler:^(BOOL granted, NSError * _Nullable error) {
+        if (error) {
+            #if DEBUG
+            NSLog(@"Error occurred in requesting authorization: %@", error.localizedDescription);
+            #endif
+        }
+    }];
     [[UIApplication sharedApplication] registerForRemoteNotifications];
-  } else {
-    UIRemoteNotificationType remoteNotificationType = self.remoteNotificationType;
-    if (!remoteNotificationType) {
-      remoteNotificationType = (UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeBadge |
-                                UIRemoteNotificationTypeSound);
-    }
-    [[UIApplication sharedApplication] registerForRemoteNotificationTypes:remoteNotificationType];
-  }
 }
 
 - (void)canceledAuthorization:(NSError *)error {

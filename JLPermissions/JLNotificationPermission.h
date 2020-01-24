@@ -1,4 +1,5 @@
 #import "JLPermissionsCore.h"
+#import <UserNotifications/UserNotifications.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -7,16 +8,10 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)sharedInstance;
 
 /**
- * For iOS 8 set this for the notification types you want to register for.  If not set, it uses
- * Alert, Badge, and Sound notification types.
+ * For iOS 10 and later, set this for the notification authorization options you want to register.  If not set, it uses
+ * Alert, Badge, and Sound and ProvidesAppNotificationSettings(iOS 12) authorization options.
  */
-@property(nonatomic) UIUserNotificationSettings *userNotificationSettings;
-
-/**
- * For iOS 7 set this for the notification types you want to register for.  If not set, it uses
- * Alert, Badge, and Sound notification types.
- */
-@property(nonatomic) UIRemoteNotificationType remoteNotificationType NS_DEPRECATED_IOS(3_0, 8_0);
+@property(nonatomic) UNAuthorizationOptions authorizationOptions;
 
 /**
  *  Uses the default dialog which is identical to the system permission dialog
